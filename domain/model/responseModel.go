@@ -21,6 +21,6 @@ type DataResponse struct {
 
 type SearchResponse struct {
 	Time      string         `json:"time"`
-	Hits      string         `json:"hits"`
+	Hits      string         `json:"hits,omitempty"`
 	Documents []DataResponse `json:"data"`
 }
