@@ -1,0 +1,37 @@
+[
+  {
+    "user_id": "5eb145b1d9968660f6aa7d73",
+    "name": "Russo Roberson",
+    "age": 23
+  },
+  {
+    "user_id": "5eb145b16f8d5a54ae0053e0",
+    "name": "Angelia Simmons",
+    "age": 38
+  },
+  {
+    "user_id": "5eb145b19d16d2bb892c5a0f",
+    "name": "Camacho Valenzuela",
+    "age": 20
+  },
+  {
+    "user_id": "5eb145b1c44712a06c290b2b",
+    "name": "Erma Fernandez",
+    "age": 26
+  },
+  {
+    "user_id": "5eb145b194b5f3d453304c52",
+    "name": "Hull Moss",
+    "age": 21
+  },
+  {
+    "user_id": "5eb145b12f19e4189249bfcd",
+    "name": "Pansy Mcclure",
+    "age": 24
+  },
+  {
+    "user_id": "5eb145b13f199a899c85c26d",
+    "name": "Andrews Becker",
+    "age": 25
+  }
+]
