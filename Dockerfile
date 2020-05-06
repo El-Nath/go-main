@@ -1,73 +1,38 @@
-FROM alpine:latest
-
-RUN apk add --no-cache \
-		ca-certificates \
-		bash
-
-RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
+#golang 1.14.2-alpine3.11
+#recommeded always pulling image using digest
+FROM golang@sha256:9b3ad7928626126b72b916609ad081cfb6c0149f6e60cef7fc1e9e15a0d1e973 AS builder
 
 ARG REPO
 ARG BRANCH
-ARG SHA256
-ARG GOVER
 
-RUN set -eux; \
-	apk add --no-cache --virtual .build-deps \
-		bash \
-		gcc \
-		musl-dev \
-		openssl \
-		go \
-	; \
-	export \
-		GOROOT_BOOTSTRAP="$(go env GOROOT)" \
-		GOOS="$(go env GOOS)" \
-		GOARCH="$(go env GOARCH)" \
-		GOHOSTOS="$(go env GOHOSTOS)" \
-		GOHOSTARCH="$(go env GOHOSTARCH)" \
-	; \
+# Install git.
+# Git is required for fetching the dependencies & sourcecode
 
+RUN apk update && apk add --no-cache git bash
 
-	apkArch="$(apk --print-arch)"; \
-	case "$apkArch" in \
-		armhf) export GOARM='6' ;; \
-		x86) export GO386='387' ;; \
-	esac; \
-	\
-	wget -O go.tgz "https://golang.org/dl/go$GOVER.src.tar.gz"; \
-	tar -C /usr/local -xzf go.tgz; \
-	rm go.tgz; \
-	\
-	cd /usr/local/go/src; \
-	for p in /go-alpine-patches/*.patch; do \
-		[ -f "$p" ] || continue; \
-		patch -p2 -i "$p"; \
-	done; \
-	./make.bash; \
-	\
-	rm -rf /go-alpine-patches; \
-	apk del .build-deps; \
-	\
-	export PATH="/usr/local/go/bin:$PATH"; \
-	go version
+WORKDIR $GOPATH/
 
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+#tweak for disable cache
+ARG CACHEBUST=1
 
-RUN apk add --no-cache git
+RUN git clone $REPO -b $BRANCH --single-branch app
 
-#start clone
-#RUN which git
-RUN git clone $REPO -b $BRANCH --single-branch ${GOPATH}
+WORKDIR $GOPATH/app
 
-RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+# Using go get.
+RUN go get -d -v
 
-RUN cd /go && \
-    go get -d -v && \
-    go build main.go
+#For small binnary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-w -s -extldflags "-static"' -a -o /go/bin/main .
 
-WORKDIR $GOPATH
+FROM scratch
 
-ENV GIN_MODE release
+COPY --from=builder /go/bin/main /
 
-CMD ["/go/main"]
+# Pick One method whether to be able to access or not
+# Execute the binary.
+ENTRYPOINT ["/main"]
+
+# Use to debug
+#CMD ["/main"]
+EXPOSE 1338
