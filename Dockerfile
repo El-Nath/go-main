@@ -25,8 +25,8 @@ RUN go get -d -v
 #For small binnary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags='-w -s -extldflags "-static"' -a -o /go/bin/main .
 
-FROM scratch
-
+#FROM scratch
+FROM alpine:latest
 COPY --from=builder /go/bin/main /
 
 # Pick One method whether to be able to access or not
