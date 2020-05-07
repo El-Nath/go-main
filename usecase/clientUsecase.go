@@ -20,16 +20,13 @@ func NewClient(c *gin.Context, cR *redis.Client) {
 	if tL == "" {
 		tL = "60"
 	}
-
+	
+	tTL, _ := strconv.Atoi(tL)
+	
 	d, err := repository.GetData(cN, cR)
 	if len(d) != 0 {
 		repository.BadResponse(c, "Failed")
 		return
-	}
-
-	tTL, err := strconv.Atoi(tL)
-	if err != nil {
-		tTL = 120
 	}
 
 	dJ, err := repository.BindJsonRequest(c)
