@@ -8,7 +8,7 @@ import (
 )
 
 func GetAllUser(c *gin.Context, db *sql.DB) {
-	q := `SELECT * FROM public.usesr ORDER BY id ASC`
+	q := `SELECT * FROM public.user ORDER BY id ASC`
 	v := []interface{}{}
 	d, err := repository.SelectSql(db, q, v)
 	if err != nil {
